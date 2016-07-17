@@ -1,0 +1,5 @@
+*.pyc
+.idea/
+secrets.py
+db.sqlite3
+
