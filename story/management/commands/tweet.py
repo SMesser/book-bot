@@ -1,5 +1,7 @@
 import tweepy # for tweeting
 import secrets # shhhh
+import sys
+from traceback import print_exc
 
 from django.core.management.base import BaseCommand
 from random import choice
@@ -32,6 +34,7 @@ class Command(BaseCommand):
 			message = self.mode_methods[mode]()
 		except Exception:
 			message = 'Chaos raged across the universe of {}'.format(mode)
+			print_exc(file=sys.stdout)
 		else:
 			if message is None:
 				message = 'Nothing much happened'
