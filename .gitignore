@@ -1,0 +1,6 @@
+db.sqlite3
+secrets.py
+.*
+!.gitignore
+*.pyc
+
