@@ -7,11 +7,17 @@ from django.db import models
 
 class Character(models.Model):
 	MALE = -1
+	NEUTER = 0
 	FEMALE = 1
+	OTHER = 2
+	MUFTALE = 3
 
 	GENDERS = (
 		(MALE, 'Male'),
 		(FEMALE, 'Female'),
+		(NEUTER, 'Neuter'),
+		(MUFTALE, 'Muftale'),
+		(OTHER, 'Varies / Other')
 	)
 	name = models.TextField(unique=True)
 	gender = models.SmallIntegerField(choices=GENDERS)
