@@ -4,18 +4,19 @@ import sys
 from traceback import print_exc
 
 from django.core.management.base import BaseCommand
-from random import choice
+from random import randint
 
-from story.models import Character, Location
+from story.actions import CharacterCreationAction, DiscoveryAction, TravelAction
+
+
+ACTION_LIST = [
+	CharacterCreationAction,
+	DiscoveryAction,
+	TravelAction,
+]
 
 
 class Command(BaseCommand):
-	def __init__(self):
-		super(Command, self).__init__()
-		self.mode_methods = {
-			'travel': self.construct_travel_message
-		}
-
 	def handle(self, *args, **options):
 		msg = self.construct_message()
 		self.tweet(msg)
@@ -29,42 +30,20 @@ class Command(BaseCommand):
 		api.update_status(status=message)
 
 	def construct_message(self):
-		mode = choice(self.mode_methods.keys())
-		try:
-			message = self.mode_methods[mode]()
-		except Exception:
-			message = 'Chaos raged across the universe of {}'.format(mode)
-			print_exc(file=sys.stdout)
-		else:
-			if message is None:
-				message = 'Nothing much happened'
-		return message
-
-	def construct_travel_message(self):
-		if Location.objects.exists() and Character.objects.exists():
-			active_char = choice(list(Character.objects.all()))
-			if active_char.location is None:
-				new_location = choice(list(Location.objects.all()))
-				active_char.location = new_location
-				active_char.save()
-				return '{} arrived at {}'.format(
-					active_char.name,
-					new_location.name
-				)
-			elif Location.objects.exclude(id=active_char.location.id).exists():
-				old_location = active_char.location
-				new_location = choice(list(Location.objects.exclude(
-					id=old_location.id
-				)))
-				active_char.location = new_location
-				active_char.save()
-				return '{} traveled from {} to {}'.format(
-					active_char.name,
-					old_location.name,
-					new_location.name
-				)
+		action_weights = {
+			action: action.weight_available()
+			for action in ACTION_LIST
+		}
+		total_weight = sum(action_weights.values())
+		item = randint(0, total_weight)
+		for action_class, action_weight in action_weights.items():
+			if action_weight < item:
+				item -= action_weight
 			else:
-				return '{} remained in {}'.format(
-					active_char.name,
-					active_char.location.name
-				)
+				try:
+					return action_class.execute()
+				except Exception:
+					print_exc(file=sys.stdout)
+					mode = action_class.__class__.__name__.strip('Action').lower()
+					return 'Chaos raged across the universe of {}.'.format(mode)
+		return 'Nothing much happened'
