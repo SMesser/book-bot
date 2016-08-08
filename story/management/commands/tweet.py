@@ -1,17 +1,23 @@
-import tweepy # for tweeting
-import secrets # shhhh
+import tweepy
+import secrets
 import sys
 from traceback import print_exc
 
 from django.core.management.base import BaseCommand
 from random import randint
 
-from story.actions import CharacterCreationAction, DiscoveryAction, TravelAction
+from story.actions import (
+	CharacterCreationAction,
+	DiscoveryAction,
+	GroupCreationAction,
+	TravelAction
+)
 
 
 ACTION_LIST = [
 	CharacterCreationAction,
 	DiscoveryAction,
+	GroupCreationAction,
 	TravelAction,
 ]
 

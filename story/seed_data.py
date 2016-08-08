@@ -20,6 +20,13 @@ CHARACTERS = [
 	{'name': 'Val Deathspeaker', 'gender': 1},
 ]
 
+GROUPS = [
+	{'name': 'Q Continuum'},
+	{'name': 'Grey Council'},
+	{'name': 'Blood Legion'},
+	{'name': 'Universal Animation Society'},
+]
+
 LOCATIONS = [
 	{'name': 'Bluebell Park'},
 	{'name': 'Dis'},

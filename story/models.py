@@ -1,11 +1,15 @@
 from __future__ import unicode_literals
 
-from django.db import models
+from django.db.models import (
+	ForeignKey,
+	ManyToManyField,
+	Model,
+	SmallIntegerField,
+	TextField
+)
 
-# Create your models here.
 
-
-class Character(models.Model):
+class Character(Model):
 	MALE = -1
 	NEUTER = 0
 	FEMALE = 1
@@ -19,9 +23,9 @@ class Character(models.Model):
 		(MUFTALE, 'Muftale'),
 		(OTHER, 'Varies / Other')
 	)
-	name = models.TextField(unique=True)
-	gender = models.SmallIntegerField(choices=GENDERS)
-	location = models.ForeignKey(
+	name = TextField(unique=True)
+	gender = SmallIntegerField(choices=GENDERS)
+	location = ForeignKey(
 		'story.Location',
 		null=True,
 		blank=True,
@@ -29,22 +33,24 @@ class Character(models.Model):
 	)
 
 
-class Office(models.Model):
+class Office(Model):
 	class Meta:
 		unique_together = (('group', 'title'),)
 
-	officer = models.ForeignKey('story.Character')
-	group = models.ForeignKey('story.Group')
-	title = models.ForeignKey('story.Title')
+	officer = ForeignKey('story.Character')
+	group = ForeignKey('story.Group')
+	title = ForeignKey('story.Title')
 
 
-class Group(models.Model):
-	name = models.TextField(unique=True)
+class Group(Model):
+	name = TextField(unique=True)
+	influences = ManyToManyField('story.Location')
+	members = ManyToManyField('story.Character')
 
 
-class Location(models.Model):
-	name = models.TextField(unique=True)
+class Location(Model):
+	name = TextField(unique=True)
 
 
-class Title(models.Model):
-	name = models.TextField(unique=True)
+class Title(Model):
+	name = TextField(unique=True)
