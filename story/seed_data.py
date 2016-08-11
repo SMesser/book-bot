@@ -13,7 +13,8 @@ CHARACTERS = [
 	{'name': 'Magaid Rhoswyn', 'gender': 1},
 	{'name': 'Maggie', 'gender': 1},
 	{'name': 'Marelli', 'gender': 1},
-	{'name': 'Saint Nog', 'gender': 3},
+	{'name': 'Nog', 'gender': 3},
+	{'name': 'Nosferatu', 'gender': -1},
 	{'name': 'Schlock', 'gender': 0},
 	{'name': 'Surolam', 'gender': 1},
 	{'name': 'Tachyon', 'gender': 1},
@@ -21,9 +22,11 @@ CHARACTERS = [
 ]
 
 GROUPS = [
-	{'name': 'Q Continuum'},
-	{'name': 'Grey Council'},
 	{'name': 'Blood Legion'},
+	{'name': 'Grey Council'},
+	{'name': 'LLC, Incorporated'},
+	{'name': 'Professional Bowlers'' Association'},
+	{'name': 'Q Continuum'},
 	{'name': 'Universal Animation Society'},
 ]
 
@@ -43,11 +46,11 @@ LOCATIONS = [
 	{'name': 'Saturn'},
 	{'name': 'Tam Elbrun'},
 	{'name': 'Texas'},
-	{'name': 'the Battle Room'},
-	{'name': 'the Moon'},
-	{'name': 'the Eiffel Tower'},
-	{'name': 'the Locust Court'},
-	{'name': 'the Statue of Liberty'},
+	{'name': 'Battle Room'},
+	{'name': 'Moon'},
+	{'name': 'Eiffel Tower'},
+	{'name': 'Locust Court'},
+	{'name': 'Statue of Liberty'},
 	{'name': 'Titan'},
 	{'name': 'Uranus'},
 	{'name': 'Venus'},
@@ -56,6 +59,8 @@ LOCATIONS = [
 TITLES = [
 	{'name': 'Captain'},
 	{'name': 'Feast-master'},
+	{'name': 'Head chef'},
+	{'name': 'General'},
 	{'name': 'Leader'},
 	{'name': 'President'},
 	{'name': 'Press Secretary'},

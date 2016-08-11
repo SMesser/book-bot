@@ -6,20 +6,7 @@ from traceback import print_exc
 from django.core.management.base import BaseCommand
 from random import randint
 
-from story.actions import (
-	CharacterCreationAction,
-	DiscoveryAction,
-	GroupCreationAction,
-	TravelAction
-)
-
-
-ACTION_LIST = [
-	CharacterCreationAction,
-	DiscoveryAction,
-	GroupCreationAction,
-	TravelAction,
-]
+from story.actions import ACTION_LIST
 
 
 class Command(BaseCommand):
@@ -50,6 +37,6 @@ class Command(BaseCommand):
 					return action_class.execute()
 				except Exception:
 					print_exc(file=sys.stdout)
-					mode = action_class.__class__.__name__.strip('Action').lower()
+					mode = action_class.__name__.strip('Action').title()
 					return 'Chaos raged across the universe of {}.'.format(mode)
 		return 'Nothing much happened'
