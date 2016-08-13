@@ -20,7 +20,7 @@ class Command(BaseCommand):
 		auth.set_access_token(secrets.access_token, secrets.access_token_secret)
 		api = tweepy.API(auth)
 		auth.secure = True
-		print("Posting message {}".format(message))
+		print('Posting message "{}"'.format(message))
 		api.update_status(status=message)
 
 	def choose_action_class(self):
