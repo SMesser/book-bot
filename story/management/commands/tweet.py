@@ -36,7 +36,7 @@ class Command(BaseCommand):
 		api = tweepy.API(auth)
 		auth.secure = True
 		print('Posting message "{}"'.format(message))
-		# api.update_status(status=message)
+		api.update_status(status=message)
 
 	def choose_action_class(self):
 		"""Choose a class of random DB actions."""
