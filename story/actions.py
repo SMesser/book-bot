@@ -51,10 +51,6 @@ class Action(object):
 		"""Update database and return a string to be tweeted."""
 		kwargs = cls.get_kwargs()
 		verb = choice(cls.VERBS)
-
-		# Make sure we end the sentence with punctuation
-		if not verb[-1] not in '.?!':
-			verb += '.'
 		return verb.format(**kwargs)
 
 	@classmethod
@@ -111,8 +107,12 @@ class CharacterCreationAction(Action):
 
 	@classmethod
 	def weight_available(cls):
-		if Character.objects.count() > len(CHARACTERS):
-			return Location.objects.count()
+		if Character.objects.count() <= len(CHARACTERS):
+			return min([
+				Location.objects.count(),
+				7,
+				len(CHARACTERS) - Character.objects.count()
+			])
 		else:
 			return 0
 
@@ -172,8 +172,8 @@ class GroupCreationAction(Action):
 
 class GroupSpreadAction(Action):
 	VERBS = [
-		'{group} gained influence in {place}',
-		'{place} fell under the sway of {group}',
+		'{group} gained influence in {place}.',
+		'{place} fell under the sway of {group}.',
 	]
 
 	@classmethod
@@ -199,8 +199,8 @@ class GroupSpreadAction(Action):
 
 class GroupDecayAction(Action):
 	VERBS = [
-		'{group} lost influence in {place}',
-		'{group} left {place}',
+		'{group} lost influence in {place}.',
+		'{group} left {place}.',
 	]
 
 	@classmethod
@@ -234,17 +234,26 @@ class JoinGroupAction(Action):
 
 class LeaveGroupAction(Action):
 	VERBS = [
-		'{character} retired from {group}',
-		'{group} '
+		'{character} retired from {group}.',
+		'{group} expelled {character}.',
+		'{character} left {group}.'
 	]
 
 	@classmethod
 	def weight_available(cls):
-		raise NotImplementedError
+		return min(
+			7,
+			Group.members.through.objects.count()
+		)
 
 	@classmethod
 	def get_kwargs(cls):
-		raise NotImplementedError
+		membership = Group.members.through.objects.order_by('?')[0]
+		membership.delete()
+		return {
+			'character': membership.character.name,
+			'group': membership.group.name
+		}
 
 
 ACTION_LIST = [
@@ -254,6 +263,6 @@ ACTION_LIST = [
 	GroupDecayAction,
 	GroupSpreadAction,
 	# JoinGroupAction,
-	# LeaveGroupAction,
+	LeaveGroupAction,
 	TravelAction,
 ]
