@@ -44,7 +44,9 @@ def create_from_through_table(through, field1, field2):
 	while not created:
 		arg1 = model1.objects.order_by('?')[0]
 		arg2 = model2.objects.order_by('?')[0]
-		record, created = through.objects.get_or_create({field1: arg1, field2:arg2})
+		record, created = through.objects.get_or_create(
+			**{field1: arg1, field2:arg2}
+		)
 	return record
 
 
