@@ -2,4 +2,4 @@ secrets.py
 .*
 !.gitignore
 *.pyc
-
+db.sqlite3
