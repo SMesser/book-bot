@@ -9,6 +9,7 @@ class StoryTestCase(TestCase):
 	Since this class has an empty setUp(), it confirms an empty database is
 	sane.
 	"""
+	longMessage = True
 
 	def assertWeightsNonnegative(self):
 		"""Assert all weights are non-negative."""
@@ -34,3 +35,12 @@ class StoryTestCase(TestCase):
 	def test_some_action_possible(self):
 		"""Whatever the initial database is, confirm some action is available"""
 		self.assertSomeActionPossible()
+
+	def test_spot_check_actions(self):
+		for action_class in ACTION_LIST:
+			if action_class.weight_available() > 0:
+				self.assertIsInstance(
+					action_class.get_kwargs(),
+					dict,
+					msg='Failure for {}'.format(action_class.__name__)
+				)

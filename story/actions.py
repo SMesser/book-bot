@@ -21,6 +21,16 @@ def create_from_seed_list(model, seed_list):
 	return record
 
 
+def get_related_model_from_through_model(through, fieldname):
+	"""Get model class referenced by a through model's field"""
+	field_attr = getattr(through, fieldname).field
+	try:
+		return field_attr.related_model
+	except AttributeError:
+		# Handle older versions of Django's non-public API
+		return field_attr.related.parent_model
+
+
 def create_from_through_table(through, field1, field2):
 	"""Create and return a random new record for a through table
 
@@ -28,8 +38,8 @@ def create_from_through_table(through, field1, field2):
 	not-yet-instantiated relationships.
 	"""
 
-	model1 = getattr(through, field1).field.related_model
-	model2 = getattr(through, field2).field.related_model
+	model1 = get_related_model_from_through_model(through, field1)
+	model2 = get_related_model_from_through_model(through, field2)
 	created = False
 	while not created:
 		arg1 = model1.objects.order_by('?')[0]
@@ -75,14 +85,18 @@ class TravelAction(Action):
 	@classmethod
 	def weight_available(cls):
 		return max(
-			Character.objects.filter(location__isnull=True).count() * (Location.objects.count() - 1),
+			Character.objects.filter(location__isnull=False).count() * (Location.objects.count() - 1),
 			0
 		)
 
 	@classmethod
 	def get_kwargs(cls):
-		character = Character.objects.order_by('?')[0]
-		location = Location.objects.exclude(id=character.location.id).order_by('?')[0]
+		character = Character.objects.filter(location__isnull=False).order_by(
+			'?'
+		)[0]
+		location = Location.objects.exclude(id=character.location.id).order_by(
+			'?'
+		)[0]
 		origin = character.location.name
 		character.location = location
 		character.save()
