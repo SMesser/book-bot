@@ -31,6 +31,7 @@ GROUPS = [
 ]
 
 LOCATIONS = [
+	{'name': 'Axanar'},
 	{'name': 'Bluebell Park'},
 	{'name': 'Dis'},
 	{'name': 'Earth'},

@@ -226,6 +226,7 @@ class GroupDecayAction(Action):
 	@classmethod
 	def get_kwargs(cls):
 		influence = Group.influences.through.objects.order_by('?')[0]
+		influence.delete()
 		return {
 			'group': influence.group.name,
 			'place': influence.location.name
@@ -240,12 +241,25 @@ class JoinGroupAction(Action):
 	]
 
 	@classmethod
-	def weight_available(cls):
+	def find_possible_joins(cls):
+		"""Find possible Join-Group Actions
+
+		Character must be in a place where the group has influence to join the
+		group.
+		"""
+
+		placed_characters = Character.objects.exclude(location__isnull=True)
+		locations = {char.location for char in placed_characters}
+
 		raise NotImplementedError
 
 	@classmethod
+	def weight_available(cls):
+		return min(7, len(cls.find_possible_joins()))
+
+	@classmethod
 	def get_kwargs(cls):
-		raise NotImplementedError
+		return choice(cls.find_possible_joins())
 
 
 class LeaveGroupAction(Action):

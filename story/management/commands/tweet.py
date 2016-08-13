@@ -9,9 +9,24 @@ from random import randint
 from story.actions import ACTION_LIST
 
 
+MAX_TWEET_LENGTH = 140
+MAX_ESTIMATE_ACTION_LENGTH = 1
+for action_class in ACTION_LIST:
+	for verb in action_class.VERBS:
+		if len(verb) >= MAX_ESTIMATE_ACTION_LENGTH:
+			MAX_ESTIMATE_ACTION_LENGTH = len(verb)
+
+
 class Command(BaseCommand):
 	def handle(self, *args, **options):
-		msg = self.construct_message()
+		msg = ''
+		parts = []
+		while len(msg) + 2 < MAX_TWEET_LENGTH - MAX_ESTIMATE_ACTION_LENGTH:
+			# Construct multiple sentences if we can do so while staying under
+			# tweet length. This isn't guaranteed in either direction, but it's
+			# a decent rough estimate.
+			parts.append(self.construct_message())
+			msg = '  '.join(parts)
 		self.tweet(msg)
 
 	def tweet(self, message):
@@ -21,7 +36,7 @@ class Command(BaseCommand):
 		api = tweepy.API(auth)
 		auth.secure = True
 		print('Posting message "{}"'.format(message))
-		api.update_status(status=message)
+		# api.update_status(status=message)
 
 	def choose_action_class(self):
 		"""Choose a class of random DB actions."""
@@ -42,7 +57,7 @@ class Command(BaseCommand):
 		"""Execute a random DB action and return a string describing it."""
 		action_class = self.choose_action_class()
 		if action_class is None:
-			return 'Nothing much happened'
+			return 'Nothing much happened.'
 		try:
 			return action_class.execute()
 		except Exception:
