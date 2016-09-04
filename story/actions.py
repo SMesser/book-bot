@@ -288,8 +288,8 @@ class JoinGroupAction(Action):
 		character = choice(list(possible_characters))
 		group = choice(list(location_groups - set(char.group_set.all())))
 		return {
-			'character': character,
-			'group': group
+			'character': character.name,
+			'group': group.name
 		}
 
 
