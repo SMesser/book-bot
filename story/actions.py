@@ -278,7 +278,7 @@ class JoinGroupAction(Action):
 
 	@classmethod
 	def get_kwargs(cls):
-		event_location = choice(cls.find_possible_joins())
+		event_location = choice(list(cls.find_possible_joins()))
 		possible_characters = set(event_location.character_set.all())
 		location_groups = set(event_location.group_set.all())
 		for char in set(possible_characters):
