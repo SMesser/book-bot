@@ -1,3 +1,4 @@
+from django.db.models import Count
 from random import choice
 
 from story.models import Character, Group, Location, Title
@@ -242,16 +243,34 @@ class JoinGroupAction(Action):
 
 	@classmethod
 	def find_possible_joins(cls):
-		"""Find possible Join-Group Actions
+		"""Find possible Join-Group Locations
 
 		Character must be in a place where the group has influence to join the
 		group.
 		"""
 
-		placed_characters = Character.objects.exclude(location__isnull=True)
-		locations = {char.location for char in placed_characters}
+		annotated_locations = Location.objects.annotate(
+			num_char=Count('character'),
+			num_group=Count('group')
+		)
+		join_locations = set(annotated_locations.filter(
+			num_char__gte=1,
+			num_group__gte=1
+		))
 
-		raise NotImplementedError
+		# Restrict join_locations if all characters there belong to all groups
+		# at that location. Copy the set so that we don't edit the set over
+		# which we iterate.
+		for loc in set(join_locations):
+			possible_characters = set(loc.character_set.all())
+			location_groups = set(loc.group_set.all())
+			for char in set(possible_characters):
+				possible_groups = location_groups - set(char.group_set.all())
+				if len(possible_groups) == 0:
+					possible_characters.pop(char)
+			if len(possible_characters) == 0:
+				join_locations.pop(loc)
+		return join_locations
 
 	@classmethod
 	def weight_available(cls):
@@ -259,7 +278,19 @@ class JoinGroupAction(Action):
 
 	@classmethod
 	def get_kwargs(cls):
-		return choice(cls.find_possible_joins())
+		event_location = choice(cls.find_possible_joins())
+		possible_characters = set(event_location.character_set.all())
+		location_groups = set(event_location.group_set.all())
+		for char in set(possible_characters):
+			possible_groups = location_groups - set(char.group_set.all())
+			if len(possible_groups) == 0:
+				possible_characters.pop(char)
+		character = choice(list(possible_characters))
+		group = choice(list(location_groups - set(char.group_set.all())))
+		return {
+			'character': character,
+			'group': group
+		}
 
 
 class LeaveGroupAction(Action):
@@ -292,7 +323,7 @@ ACTION_LIST = [
 	GroupCreationAction,
 	GroupDecayAction,
 	GroupSpreadAction,
-	# JoinGroupAction,
+	JoinGroupAction,
 	LeaveGroupAction,
 	TravelAction,
 ]
