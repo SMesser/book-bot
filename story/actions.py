@@ -267,9 +267,9 @@ class JoinGroupAction(Action):
 			for char in set(possible_characters):
 				possible_groups = location_groups - set(char.group_set.all())
 				if len(possible_groups) == 0:
-					possible_characters.pop(char)
+					possible_characters.remove(char)
 			if len(possible_characters) == 0:
-				join_locations.pop(loc)
+				join_locations.remove(loc)
 		return join_locations
 
 	@classmethod

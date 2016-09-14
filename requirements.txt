@@ -3,4 +3,4 @@ nltk==3.0.5
 oauthlib==1.0.3
 six==1.9.0
 tweepy==3.4.0
-
+factory-boy>=2.6

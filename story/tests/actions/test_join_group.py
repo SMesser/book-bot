@@ -1,10 +1,12 @@
 from django.test import TestCase
-from random import choice
 
 from story.actions import JoinGroupAction
-from story.models import Character, Group, Location
-from story.seed_data import CHARACTERS, GROUPS, LOCATIONS
 from story.tests.actions.action_test_case import GenericActionTestMixin
+from story.tests.factories import (
+	CharacterFactory,
+	GroupFactory,
+	LocationFactory
+)
 
 
 class JoinGroupTestCase(GenericActionTestMixin, TestCase):
@@ -16,17 +18,38 @@ class JoinGroupTestCase(GenericActionTestMixin, TestCase):
 
 	def test_characters_without_groups_implies_zero_weight(self):
 		"""A characters with no Group gives zero weight."""
-		new_place = Location.objects.create(**choice(LOCATIONS))
-		Character.objects.create(
-			location=new_place,
-			**choice(CHARACTERS)
-		)
+		new_place = LocationFactory()
+		CharacterFactory(location=new_place)
 		self.assertEqual(self.action_class.weight_available(), 0)
 
 	def test_no_characters_implies_zero_weight(self):
 		"""A location with no character gives zero weight."""
-		new_group = Group.objects.create(**choice(GROUPS))
-		new_place = Location.objects.create(**choice(LOCATIONS))
+		new_group = GroupFactory()
+		new_place = LocationFactory()
 		new_group.influences.add(new_place)
-
 		self.assertEqual(self.action_class.weight_available(), 0)
+
+	def test_only_char_at_group_location_in_group_implies_zero_weight(self):
+		"""Can't add existing members to a group"""
+		place = LocationFactory()
+		group = GroupFactory()
+		char = CharacterFactory(location=place)
+		group.members.add(char)
+		group.influences.add(place)
+		self.assertEqual(self.action_class.weight_available(), 0)
+
+	def test_character_not_at_group_location_implies_zero_weight(self):
+		"""Can't join a distant group"""
+		char_place, group_place = LocationFactory.create_batch(2)
+		group = GroupFactory()
+		CharacterFactory(location=char_place)
+		group.influences.add(group_place)
+		self.assertEqual(self.action_class.weight_available(), 0)
+
+	def test_nonmember_at_group_location_gives_positive_weight(self):
+		"""Can join a local group"""
+		place = LocationFactory()
+		group = GroupFactory()
+		char = CharacterFactory(location=place)
+		group.influences.add(place)
+		self.assertGreaterEqual(self.action_class.weight_available(), 1)
