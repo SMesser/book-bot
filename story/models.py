@@ -32,6 +32,9 @@ class Character(Model):
 		default=None
 	)
 
+	def __str__(self):
+		return self.name
+
 
 class Office(Model):
 	class Meta:
@@ -41,16 +44,33 @@ class Office(Model):
 	group = ForeignKey('story.Group')
 	title = ForeignKey('story.Title')
 
+	def __str__(self):
+		return '{} {}: {}'.format(
+			self.group.name,
+			self.title.name,
+			self.officer.name
+		)
+
 
 class Group(Model):
 	name = TextField(unique=True)
 	influences = ManyToManyField('story.Location')
 	members = ManyToManyField('story.Character')
 
+	def __str__(self):
+		return self.name
+
 
 class Location(Model):
 	name = TextField(unique=True)
 
+	def __str__(self):
+		return self.name
+
 
 class Title(Model):
 	name = TextField(unique=True)
+
+	def __str__(self):
+		return self.name
+

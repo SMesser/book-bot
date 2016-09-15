@@ -284,9 +284,10 @@ class JoinGroupAction(Action):
 		for char in set(possible_characters):
 			possible_groups = location_groups - set(char.group_set.all())
 			if len(possible_groups) == 0:
-				possible_characters.pop(char)
+				possible_characters.remove(char)
 		character = choice(list(possible_characters))
-		group = choice(list(location_groups - set(char.group_set.all())))
+		group = choice(list(location_groups - set(character.group_set.all())))
+		group.members.add(character)
 		return {
 			'character': character.name,
 			'group': group.name

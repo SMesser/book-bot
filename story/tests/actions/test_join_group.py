@@ -46,10 +46,37 @@ class JoinGroupTestCase(GenericActionTestMixin, TestCase):
 		group.influences.add(group_place)
 		self.assertEqual(self.action_class.weight_available(), 0)
 
-	def test_nonmember_at_group_location_gives_positive_weight(self):
+	def test_nonmember_at_group_location_single_choice(self):
 		"""Can join a local group"""
+		place = LocationFactory()
+		group = GroupFactory()
+		CharacterFactory(location=place)
+		group.influences.add(place)
+		self.assertEqual(self.action_class.weight_available(), 1)
+
+	def test_nonmember_at_group_location_yields_predicted_choice(self):
+		"""Acceptable character can join local group"""
+		place = LocationFactory()
+		group = GroupFactory()
+		char, member = CharacterFactory.create_batch(2, location=place)
+		group.influences.add(place)
+		group.members.add(member)
+		self.assertEqual(
+			self.action_class.get_kwargs(),
+			{
+				'character': char.name,
+				'group': group.name
+			}
+		)
+
+	def test_nonmember_at_group_location_yields_predicted_choice(self):
+		"""Acceptable character can join local group"""
 		place = LocationFactory()
 		group = GroupFactory()
 		char = CharacterFactory(location=place)
 		group.influences.add(place)
-		self.assertGreaterEqual(self.action_class.weight_available(), 1)
+		self.action_class.get_kwargs()
+		self.assertEqual(
+			{char},
+			set(group.members.all())
+		)
